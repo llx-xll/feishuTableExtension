@@ -928,7 +928,10 @@ function matchFields(srcFieldMateList, dstFieldMateList) {
         if (dstField.type === srcType) {
           // 类型相同
           if (!noCopyTypeList.includes(dstField.type)) {
-            fieldIdSrcToDst[srcId] = dstField.id;
+            fieldIdSrcToDst[srcId] = {
+              id: dstField.id,
+              type: dstField.type
+            };
           }
         }
       }
@@ -954,9 +957,23 @@ function copyRecordsToOtherTable(srcFieldMateList, dstFieldMateList, srcRecords)
       var dstFields = {};
       var srcFields = record.fields;
       for (var fieldId in srcFields) {
-        var dstFieldId = fieldIdMatch[fieldId];
-        if (dstFieldId) {
-          dstFields[dstFieldId] = srcFields[fieldId];
+        var dstFieldInfo = fieldIdMatch[fieldId];
+        if (dstFieldInfo) {
+          switch (dstFieldInfo.type) {
+            case 20:
+              // “公式”
+              break;
+            case 21:
+              // “双向关联”
+              if (srcFields[fieldId] && srcFields[fieldId].recordIds) {
+                dstFields[dstFieldInfo.id] = {
+                  recordIds: srcFields[fieldId].recordIds
+                };
+              }
+              break;
+            default:
+              dstFields[dstFieldInfo.id] = srcFields[fieldId];
+          }
         }
       }
       outRecords.push({
@@ -1188,7 +1205,7 @@ function _caiGouToXianCun() {
             break;
           }
           console.log("copyRecords: ", copyRecords);
-          dstRecords = copyRecordsToOtherTable(inputFieldMetaList, outputFieldMetaList, copyRecords);
+          dstRecords = copyRecordsToOtherTable(inputFieldMetaList, outputFieldMetaList, copyRecords, [20, 21]);
           console.log("dstRecords: ", dstRecords);
           _context.next = 83;
           return outputTable.addRecords(dstRecords);
