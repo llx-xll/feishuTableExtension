@@ -941,98 +941,142 @@ function matchFields(srcFieldMateList, dstFieldMateList) {
   }
   return matchOut;
 }
-function copyRecordsToString(srcFieldMateList, dstFieldMateList, srcRecords) {
-  var outRecords = [];
-  // 获取字段id对应关系
-  var fieldMatch = matchFields(srcFieldMateList, dstFieldMateList);
-  console.log("fieldMatch: ", fieldMatch);
-  // 执行copy赋值
-  var _iterator2 = subUtils_createForOfIteratorHelper(srcRecords),
+function constructOneDstRecordFields(fieldMatch, srcFields) {
+  var dstFields = {};
+  var status = "已同步";
+  var _iterator2 = subUtils_createForOfIteratorHelper(fieldMatch),
     _step2;
   try {
     for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-      var record = _step2.value;
-      var dstFields = {};
-      var srcFields = record.fields;
-
-      // 遍历match
-      var _iterator3 = subUtils_createForOfIteratorHelper(fieldMatch),
-        _step3;
-      try {
-        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-          var match = _step3.value;
-          var srcId = match.srcId;
-          var srcType = match.srcType;
-          var dstId = match.dstId;
-          if (!srcFields[srcId]) {
-            continue;
-          }
-          console.log("name: ".concat(match.srcName, ", fields: "), srcFields[srcId]);
-          if (srcType === 3) {
-            // 单选
-            dstFields[dstId] = [{
-              text: srcFields[srcId].text,
-              type: "text"
-            }];
-          } else if (srcType === 4) {// 多选
-          } else if (srcType === 15) {
-            // 超链接
-            dstFields[dstId] = [{
-              text: srcFields[srcId].text,
-              type: "text"
-            }];
-          } else if (srcType === 17) {// 附件
-          } else if (srcType === 18) {// 单向关联
-          } else if (srcType === 19) {// 查找引用
-          } else if (srcType === 20) {
-            // 公式
-            var srcData = srcFields[srcId];
-            if (Array.isArray(srcData)) {
-              dstFields[dstId] = [{
-                text: srcData[0].text,
-                type: "text"
-              }];
-            } else if (subUtils_typeof(srcData) === "object") {
-              dstFields[dstId] = [{
-                text: srcData.text,
-                type: "text"
-              }];
-            } else if (typeof srcData === "string") {
-              dstFields[dstId] = [{
-                text: srcData,
-                type: "text"
-              }];
-            } else if (typeof srcData === "number") {
-              dstFields[dstId] = [{
-                text: String(srcData),
-                type: "text"
-              }];
-            }
-          } else if (srcType === 21) {
-            // 双向关联
-            dstFields[dstId] = [{
-              text: srcFields[srcId].text,
-              type: "text"
-            }];
-          } else {
-            dstFields[dstId] = srcFields[srcId];
-          }
-        }
-      } catch (err) {
-        _iterator3.e(err);
-      } finally {
-        _iterator3.f();
+      var match = _step2.value;
+      var srcId = match.srcId;
+      var srcType = match.srcType;
+      var dstId = match.dstId;
+      if (!srcFields[srcId]) {
+        continue;
       }
-      outRecords.push({
-        fields: dstFields
-      });
+      console.log("name: ".concat(match.srcName, ", fields: "), srcFields[srcId]);
+      if (srcType === 3) {
+        // 单选
+        dstFields[dstId] = [{
+          text: srcFields[srcId].text,
+          type: "text"
+        }];
+      } else if (srcType === 4) {// 多选
+      } else if (srcType === 5) {
+        // 日期
+        dstFields[dstId] = srcFields[srcId];
+      } else if (srcType === 11) {
+        // 人员
+        if (srcFields[srcId][0]) {
+          // 好友人员信息
+          dstFields[dstId] = srcFields[srcId];
+        } else {
+          // 非好友人员信息
+          console.error("待拷贝数据中“人员信息”存在非联系人，无法复制");
+          return {
+            dstFields: null,
+            status: "同步失败：人员非好友"
+          };
+        }
+      } else if (srcType > 100) {
+        continue;
+      } else if (srcType === 13) {
+        // 手机号
+        dstFields[dstId] = [{
+          text: srcFields[srcId],
+          type: "text"
+        }];
+      } else if (srcType === 15) {
+        // 超链接
+        dstFields[dstId] = [{
+          text: srcFields[srcId].text,
+          type: "text"
+        }];
+      } else if (srcType === 17) {// 附件
+      } else if (srcType === 18) {// 单向关联
+      } else if (srcType === 19) {// 查找引用
+      } else if (srcType === 20) {
+        // 公式
+        var srcData = srcFields[srcId];
+        if (Array.isArray(srcData)) {
+          dstFields[dstId] = [{
+            text: srcData[0].text,
+            type: "text"
+          }];
+        } else if (subUtils_typeof(srcData) === "object") {
+          dstFields[dstId] = [{
+            text: srcData.text,
+            type: "text"
+          }];
+        } else if (typeof srcData === "string") {
+          dstFields[dstId] = [{
+            text: srcData,
+            type: "text"
+          }];
+        } else if (typeof srcData === "number") {
+          dstFields[dstId] = [{
+            text: String(srcData),
+            type: "text"
+          }];
+        }
+      } else if (srcType === 21) {
+        // 双向关联
+        dstFields[dstId] = [{
+          text: srcFields[srcId].text,
+          type: "text"
+        }];
+      } else {
+        // 其他类型
+        dstFields[dstId] = srcFields[srcId];
+      }
     }
   } catch (err) {
     _iterator2.e(err);
   } finally {
     _iterator2.f();
   }
-  return outRecords;
+  return {
+    dstFields: dstFields,
+    status: status
+  };
+}
+function copyRecordsToString(srcFieldMateList, dstFieldMateList, srcRecords) {
+  var outRecords = [];
+  var copyState = [];
+  // 获取字段id对应关系
+  var fieldMatch = matchFields(srcFieldMateList, dstFieldMateList);
+  console.log("fieldMatch: ", fieldMatch);
+  // 执行copy赋值
+  var _iterator3 = subUtils_createForOfIteratorHelper(srcRecords),
+    _step3;
+  try {
+    for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+      var record = _step3.value;
+      var srcFields = record.fields;
+
+      // 构建单行记录
+      var constructOut = constructOneDstRecordFields(fieldMatch, srcFields);
+      var dstFields = constructOut.dstFields;
+      var status = constructOut.status;
+      if (dstFields) {
+        outRecords.push({
+          fields: dstFields
+        });
+      }
+      if (status) {
+        copyState.push(status);
+      }
+    }
+  } catch (err) {
+    _iterator3.e(err);
+  } finally {
+    _iterator3.f();
+  }
+  return {
+    outRecords: outRecords,
+    copyState: copyState
+  };
 }
 ;// ./E001boDunERPtbCopy/function1.js
 function function1_typeof(o) { "@babel/helpers - typeof"; return function1_typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, function1_typeof(o); }
@@ -1049,7 +1093,7 @@ function copyClient() {
 }
 function _copyClient() {
   _copyClient = function1_asyncToGenerator(/*#__PURE__*/function1_regeneratorRuntime().mark(function _callee() {
-    var inputTableName, outputTableName, selection, inputTable, inputName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, stateFieldName, stateField, copyRecords, _iterator, _step, recordId, recordValue, res, dstRecords, res1;
+    var inputTableName, outputTableName, selection, inputTable, inputName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, stateFieldName, stateField, copyRecords, _iterator, _step, _recordId, recordValue, copyOut, dstRecords, copyStatus, res1, index, recordId, status, res;
     return function1_regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
@@ -1081,7 +1125,7 @@ function _copyClient() {
           // 获取选中的table名称
           console.log("inputName:", inputName);
           if (!(inputName === inputTableName)) {
-            _context.next = 83;
+            _context.next = 91;
             break;
           }
           _context.next = 20;
@@ -1124,72 +1168,90 @@ function _copyClient() {
           _iterator.s();
         case 45:
           if ((_step = _iterator.n()).done) {
-            _context.next = 57;
+            _context.next = 53;
             break;
           }
-          recordId = _step.value;
+          _recordId = _step.value;
           _context.next = 49;
-          return inputTable.getRecordById(recordId);
+          return inputTable.getRecordById(_recordId);
         case 49:
           recordValue = _context.sent;
           copyRecords.push(recordValue);
           // 修改状态
-          _context.next = 53;
-          return stateField.setValue(recordId, "已同步");
-        case 53:
-          res = _context.sent;
-          console.log("setRecord res:", res);
-        case 55:
+          // const res = await stateField.setValue(recordId, "已同步");
+          // console.log("setRecord res:", res);
+        case 51:
           _context.next = 45;
           break;
-        case 57:
-          _context.next = 62;
+        case 53:
+          _context.next = 58;
           break;
-        case 59:
-          _context.prev = 59;
+        case 55:
+          _context.prev = 55;
           _context.t0 = _context["catch"](43);
           _iterator.e(_context.t0);
-        case 62:
-          _context.prev = 62;
+        case 58:
+          _context.prev = 58;
           _iterator.f();
-          return _context.finish(62);
-        case 65:
+          return _context.finish(58);
+        case 61:
           if (!(copyRecords.length > 0)) {
-            _context.next = 81;
+            _context.next = 89;
             break;
           }
           console.log("copyRecords: ", copyRecords);
           // 写入第1个表
-          dstRecords = copyRecordsToString(inputFieldMetaList, outputFieldMetaList, copyRecords);
+          copyOut = copyRecordsToString(inputFieldMetaList, outputFieldMetaList, copyRecords);
+          dstRecords = copyOut.outRecords;
+          copyStatus = copyOut.copyState;
           console.log("dstRecords: ", dstRecords);
-          _context.prev = 69;
-          _context.next = 72;
+          _context.prev = 67;
+          _context.next = 70;
           return outputTable.addRecords(dstRecords);
-        case 72:
+        case 70:
           res1 = _context.sent;
           console.log("addRecords res:", res1);
-          _context.next = 79;
-          break;
-        case 76:
-          _context.prev = 76;
-          _context.t1 = _context["catch"](69);
-          console.error("addRecords error:", _context.t1);
+
+          // 修改状态
+          index = 0;
+        case 73:
+          if (!(index < selectRecordIdList.length)) {
+            _context.next = 82;
+            break;
+          }
+          recordId = selectRecordIdList[index];
+          status = copyStatus[index];
+          _context.next = 78;
+          return stateField.setValue(recordId, status);
+        case 78:
+          res = _context.sent;
         case 79:
-          _context.next = 81;
+          index++;
+          _context.next = 73;
+          break;
+        case 82:
+          _context.next = 84;
           return chunk_FXRHZUWR_p.ui.showToast({
             toastType: 'success',
-            message: "\u5DF2\u5B8C\u6210".concat(copyRecords.length, "\u4E2A\u8BB0\u5F55\u62F7\u8D1D")
+            message: "\u62F7\u8D1D\u5B8C\u6210\uFF0C\u6210\u529F".concat(dstRecords.length, "\u6761\uFF0C \u5931\u8D25").concat(selectRecordIdList.length - dstRecords.length, "\u6761")
           });
-        case 81:
-          _context.next = 84;
-          break;
-        case 83:
-          alert("\u8BF7\u9009\u62E9\u8868\u683C\uFF1A".concat(inputTableName, " \u540E\uFF0C\u518D\u70B9\u51FB\u62F7\u8D1D"));
         case 84:
+          _context.next = 89;
+          break;
+        case 86:
+          _context.prev = 86;
+          _context.t1 = _context["catch"](67);
+          console.error("addRecords error:", _context.t1);
+        case 89:
+          _context.next = 92;
+          break;
+        case 91:
+          alert("\u8BF7\u9009\u62E9\u8868\u683C\uFF1A".concat(inputTableName, " \u540E\uFF0C\u518D\u70B9\u51FB\u62F7\u8D1D"));
+        case 92:
         case "end":
           return _context.stop();
       }
-    }, _callee, null, [[43, 59, 62, 65], [69, 76]]);
+    }, _callee, null, [[43, 55, 58, 61], [67, 86]]);
   }));
   return _copyClient.apply(this, arguments);
 }
