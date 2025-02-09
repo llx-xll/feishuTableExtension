@@ -993,7 +993,9 @@ function constructOneDstRecordFields(fieldMatch, srcFields) {
           text: srcFields[srcId].text,
           type: "text"
         }];
-      } else if (srcType === 17) {// 附件
+      } else if (srcType === 17) {
+        // 附件
+        dstFields[dstId] = srcFields[srcId];
       } else if (srcType === 18) {// 单向关联
       } else if (srcType === 19) {// 查找引用
       } else if (srcType === 20) {
@@ -1093,7 +1095,7 @@ function copyClient() {
 }
 function _copyClient() {
   _copyClient = function1_asyncToGenerator(/*#__PURE__*/function1_regeneratorRuntime().mark(function _callee() {
-    var inputTableName, outputTableName, selection, inputTable, inputName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, stateFieldName, stateField, copyRecords, _iterator, _step, _recordId, recordValue, copyOut, dstRecords, copyStatus, res1, index, recordId, status, res;
+    var inputTableName, outputTableName, selection, inputTable, inputName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, stateFieldName, stateField, copyRecords, copyRecordIds, _iterator, _step, _recordId, recordValue, stateValue, copyOut, dstRecords, copyStatus, res1, index, recordId, status, res;
     return function1_regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
@@ -1125,7 +1127,7 @@ function _copyClient() {
           // 获取选中的table名称
           console.log("inputName:", inputName);
           if (!(inputName === inputTableName)) {
-            _context.next = 91;
+            _context.next = 101;
             break;
           }
           _context.next = 20;
@@ -1163,40 +1165,49 @@ function _copyClient() {
           stateField = _context.sent;
           // 3、读取待拷贝records
           copyRecords = []; // 待拷贝数据
+          copyRecordIds = []; // 待拷贝数据id
           _iterator = function1_createForOfIteratorHelper(selectRecordIdList);
-          _context.prev = 43;
+          _context.prev = 44;
           _iterator.s();
-        case 45:
+        case 46:
           if ((_step = _iterator.n()).done) {
-            _context.next = 53;
+            _context.next = 60;
             break;
           }
           _recordId = _step.value;
-          _context.next = 49;
+          _context.next = 50;
           return inputTable.getRecordById(_recordId);
-        case 49:
+        case 50:
           recordValue = _context.sent;
-          copyRecords.push(recordValue);
-          // 修改状态
-          // const res = await stateField.setValue(recordId, "已同步");
-          // console.log("setRecord res:", res);
-        case 51:
-          _context.next = 45;
-          break;
+          _context.next = 53;
+          return stateField.getValue(_recordId);
         case 53:
-          _context.next = 58;
-          break;
-        case 55:
-          _context.prev = 55;
-          _context.t0 = _context["catch"](43);
-          _iterator.e(_context.t0);
+          stateValue = _context.sent;
+          if (!(stateValue && stateValue.length > 0 && stateValue[0].text === "已同步")) {
+            _context.next = 56;
+            break;
+          }
+          return _context.abrupt("continue", 58);
+        case 56:
+          copyRecords.push(recordValue);
+          copyRecordIds.push(_recordId);
         case 58:
-          _context.prev = 58;
+          _context.next = 46;
+          break;
+        case 60:
+          _context.next = 65;
+          break;
+        case 62:
+          _context.prev = 62;
+          _context.t0 = _context["catch"](44);
+          _iterator.e(_context.t0);
+        case 65:
+          _context.prev = 65;
           _iterator.f();
-          return _context.finish(58);
-        case 61:
+          return _context.finish(65);
+        case 68:
           if (!(copyRecords.length > 0)) {
-            _context.next = 89;
+            _context.next = 98;
             break;
           }
           console.log("copyRecords: ", copyRecords);
@@ -1205,53 +1216,58 @@ function _copyClient() {
           dstRecords = copyOut.outRecords;
           copyStatus = copyOut.copyState;
           console.log("dstRecords: ", dstRecords);
-          _context.prev = 67;
-          _context.next = 70;
+          _context.prev = 74;
+          _context.next = 77;
           return outputTable.addRecords(dstRecords);
-        case 70:
+        case 77:
           res1 = _context.sent;
           console.log("addRecords res:", res1);
 
           // 修改状态
           index = 0;
-        case 73:
-          if (!(index < selectRecordIdList.length)) {
-            _context.next = 82;
+        case 80:
+          if (!(index < copyRecordIds.length)) {
+            _context.next = 89;
             break;
           }
-          recordId = selectRecordIdList[index];
+          recordId = copyRecordIds[index];
           status = copyStatus[index];
-          _context.next = 78;
+          _context.next = 85;
           return stateField.setValue(recordId, status);
-        case 78:
+        case 85:
           res = _context.sent;
-        case 79:
+        case 86:
           index++;
-          _context.next = 73;
+          _context.next = 80;
           break;
-        case 82:
-          _context.next = 84;
+        case 89:
+          _context.next = 91;
           return chunk_FXRHZUWR_p.ui.showToast({
             toastType: 'success',
-            message: "\u62F7\u8D1D\u5B8C\u6210\uFF0C\u6210\u529F".concat(dstRecords.length, "\u6761\uFF0C \u5931\u8D25").concat(selectRecordIdList.length - dstRecords.length, "\u6761")
+            message: "\u62F7\u8D1D\u5B8C\u6210\uFF0C\u6210\u529F".concat(dstRecords.length, "\u6761\uFF0C \u5931\u8D25").concat(copyRecordIds.length - dstRecords.length, "\u6761\uFF0C \u9009\u4E2D\u5DF2\u540C\u6B65").concat(selectRecordIdList.length - copyRecordIds.length, "\u6761")
           });
-        case 84:
-          _context.next = 89;
-          break;
-        case 86:
-          _context.prev = 86;
-          _context.t1 = _context["catch"](67);
-          console.error("addRecords error:", _context.t1);
-        case 89:
-          _context.next = 92;
-          break;
         case 91:
+          _context.next = 96;
+          break;
+        case 93:
+          _context.prev = 93;
+          _context.t1 = _context["catch"](74);
+          console.error("addRecords error:", _context.t1);
+        case 96:
+          _context.next = 99;
+          break;
+        case 98:
+          alert("\u8FD0\u884C\u7ED3\u675F\uFF0C\u62F7\u8D1D0\u6761\uFF1A\u9009\u4E2D\u8BB0\u5F55\u5DF2\u540C\u6B65");
+        case 99:
+          _context.next = 102;
+          break;
+        case 101:
           alert("\u8BF7\u9009\u62E9\u8868\u683C\uFF1A".concat(inputTableName, " \u540E\uFF0C\u518D\u70B9\u51FB\u62F7\u8D1D"));
-        case 92:
+        case 102:
         case "end":
           return _context.stop();
       }
-    }, _callee, null, [[43, 55, 58, 61], [67, 86]]);
+    }, _callee, null, [[44, 62, 65, 68], [74, 93]]);
   }));
   return _copyClient.apply(this, arguments);
 }
@@ -1270,7 +1286,7 @@ function copySample() {
 }
 function _copySample() {
   _copySample = function2_asyncToGenerator(/*#__PURE__*/function2_regeneratorRuntime().mark(function _callee() {
-    var inputTableName, outputTableName, selection, inputTable, inputName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, stateFieldName, stateField, copyRecords, _iterator, _step, _recordId, recordValue, copyOut, dstRecords, copyStatus, res1, index, recordId, status, res;
+    var inputTableName, outputTableName, selection, inputTable, inputName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, stateFieldName, stateField, copyRecords, copyRecordIds, _iterator, _step, _recordId, recordValue, stateValue, copyOut, dstRecords, copyStatus, res1, index, recordId, status, res;
     return function2_regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
@@ -1302,7 +1318,7 @@ function _copySample() {
           // 获取选中的table名称
           console.log("inputName:", inputName);
           if (!(inputName === inputTableName)) {
-            _context.next = 91;
+            _context.next = 101;
             break;
           }
           _context.next = 20;
@@ -1340,39 +1356,49 @@ function _copySample() {
           stateField = _context.sent;
           // 3、读取待拷贝records
           copyRecords = []; // 待拷贝数据
+          copyRecordIds = []; // 待拷贝数据id
           _iterator = function2_createForOfIteratorHelper(selectRecordIdList);
-          _context.prev = 43;
+          _context.prev = 44;
           _iterator.s();
-        case 45:
+        case 46:
           if ((_step = _iterator.n()).done) {
-            _context.next = 53;
+            _context.next = 60;
             break;
           }
           _recordId = _step.value;
-          _context.next = 49;
+          _context.next = 50;
           return inputTable.getRecordById(_recordId);
-        case 49:
+        case 50:
           recordValue = _context.sent;
-          copyRecords.push(recordValue);
-          // 修改状态     // const res = await stateField.setValue(recordId, "已同步");
-          // console.log("setRecord res:", res);
-        case 51:
-          _context.next = 45;
-          break;
+          _context.next = 53;
+          return stateField.getValue(_recordId);
         case 53:
-          _context.next = 58;
-          break;
-        case 55:
-          _context.prev = 55;
-          _context.t0 = _context["catch"](43);
-          _iterator.e(_context.t0);
+          stateValue = _context.sent;
+          if (!(stateValue && stateValue.length > 0 && stateValue[0].text === "已同步")) {
+            _context.next = 56;
+            break;
+          }
+          return _context.abrupt("continue", 58);
+        case 56:
+          copyRecords.push(recordValue);
+          copyRecordIds.push(_recordId);
         case 58:
-          _context.prev = 58;
+          _context.next = 46;
+          break;
+        case 60:
+          _context.next = 65;
+          break;
+        case 62:
+          _context.prev = 62;
+          _context.t0 = _context["catch"](44);
+          _iterator.e(_context.t0);
+        case 65:
+          _context.prev = 65;
           _iterator.f();
-          return _context.finish(58);
-        case 61:
+          return _context.finish(65);
+        case 68:
           if (!(copyRecords.length > 0)) {
-            _context.next = 89;
+            _context.next = 98;
             break;
           }
           console.log("copyRecords: ", copyRecords);
@@ -1381,53 +1407,58 @@ function _copySample() {
           dstRecords = copyOut.outRecords;
           copyStatus = copyOut.copyState;
           console.log("dstRecords: ", dstRecords);
-          _context.prev = 67;
-          _context.next = 70;
+          _context.prev = 74;
+          _context.next = 77;
           return outputTable.addRecords(dstRecords);
-        case 70:
+        case 77:
           res1 = _context.sent;
           console.log("addRecords res:", res1);
 
           // 修改状态
           index = 0;
-        case 73:
-          if (!(index < selectRecordIdList.length)) {
-            _context.next = 82;
+        case 80:
+          if (!(index < copyRecordIds.length)) {
+            _context.next = 89;
             break;
           }
-          recordId = selectRecordIdList[index];
+          recordId = copyRecordIds[index];
           status = copyStatus[index];
-          _context.next = 78;
+          _context.next = 85;
           return stateField.setValue(recordId, status);
-        case 78:
+        case 85:
           res = _context.sent;
-        case 79:
+        case 86:
           index++;
-          _context.next = 73;
+          _context.next = 80;
           break;
-        case 82:
-          _context.next = 84;
+        case 89:
+          _context.next = 91;
           return chunk_FXRHZUWR_p.ui.showToast({
             toastType: 'success',
-            message: "\u62F7\u8D1D\u5B8C\u6210\uFF0C\u6210\u529F".concat(dstRecords.length, "\u6761\uFF0C \u5931\u8D25").concat(selectRecordIdList.length - dstRecords.length, "\u6761")
+            message: "\u62F7\u8D1D\u5B8C\u6210\uFF0C\u6210\u529F".concat(dstRecords.length, "\u6761\uFF0C \u5931\u8D25").concat(copyRecordIds.length - dstRecords.length, "\u6761\uFF0C \u9009\u4E2D\u5DF2\u540C\u6B65").concat(selectRecordIdList.length - copyRecordIds.length, "\u6761")
           });
-        case 84:
-          _context.next = 89;
-          break;
-        case 86:
-          _context.prev = 86;
-          _context.t1 = _context["catch"](67);
-          console.error("addRecords error:", _context.t1);
-        case 89:
-          _context.next = 92;
-          break;
         case 91:
+          _context.next = 96;
+          break;
+        case 93:
+          _context.prev = 93;
+          _context.t1 = _context["catch"](74);
+          console.error("addRecords error:", _context.t1);
+        case 96:
+          _context.next = 99;
+          break;
+        case 98:
+          alert("\u8FD0\u884C\u7ED3\u675F\uFF0C\u62F7\u8D1D0\u6761\uFF1A\u9009\u4E2D\u8BB0\u5F55\u5DF2\u540C\u6B65");
+        case 99:
+          _context.next = 102;
+          break;
+        case 101:
           alert("\u8BF7\u9009\u62E9\u8868\u683C\uFF1A".concat(inputTableName, " \u540E\uFF0C\u518D\u70B9\u51FB\u62F7\u8D1D"));
-        case 92:
+        case 102:
         case "end":
           return _context.stop();
       }
-    }, _callee, null, [[43, 55, 58, 61], [67, 86]]);
+    }, _callee, null, [[44, 62, 65, 68], [74, 93]]);
   }));
   return _copySample.apply(this, arguments);
 }
