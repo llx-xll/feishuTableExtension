@@ -1076,7 +1076,7 @@ function caiGouToXianCun() {
 }
 function _caiGouToXianCun() {
   _caiGouToXianCun = function01_asyncToGenerator(/*#__PURE__*/function01_regeneratorRuntime().mark(function _callee() {
-    var inputTableName, outputTableName, selection, inputTable, inputName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, stateFieldName, stateField, stateOptions, copyRecords, _iterator, _step, recordId, recordValue, stateValue, _res, dstRecords, res;
+    var inputTableName, outputTableName, selection, inputTable, inputName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, stateFieldName, stateField, stateOptions, copyRecords, copyRecordIds, _iterator, _step, _recordId, recordValue, stateValue, dstRecords, res, _iterator2, _step2, recordId, _res;
     return function01_regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
@@ -1108,7 +1108,7 @@ function _caiGouToXianCun() {
           // 获取选中的table名称
           console.log("inputName:", inputName);
           if (!(inputName === inputTableName)) {
-            _context.next = 92;
+            _context.next = 109;
             break;
           }
           _context.next = 20;
@@ -1154,86 +1154,115 @@ function _caiGouToXianCun() {
 
           // 4、读取待拷贝records
           copyRecords = [];
+          copyRecordIds = [];
           _iterator = function01_createForOfIteratorHelper(selectRecordIdList);
-          _context.prev = 47;
+          _context.prev = 48;
           _iterator.s();
-        case 49:
+        case 50:
           if ((_step = _iterator.n()).done) {
-            _context.next = 69;
+            _context.next = 67;
             break;
           }
-          recordId = _step.value;
-          _context.next = 53;
-          return inputTable.getRecordById(recordId);
-        case 53:
+          _recordId = _step.value;
+          _context.next = 54;
+          return inputTable.getRecordById(_recordId);
+        case 54:
           recordValue = _context.sent;
-          _context.next = 56;
-          return stateField.getValue(recordId);
-        case 56:
+          _context.next = 57;
+          return stateField.getValue(_recordId);
+        case 57:
           stateValue = _context.sent;
           console.log("stateValue:", stateValue);
           if (!(stateValue && stateValue.text === "已同步")) {
-            _context.next = 62;
+            _context.next = 63;
             break;
           }
-          return _context.abrupt("continue", 67);
-        case 62:
+          return _context.abrupt("continue", 65);
+        case 63:
           copyRecords.push(recordValue);
+          copyRecordIds.push(_recordId);
           // 1、更新状态
-          _context.next = 65;
-          return stateField.setValue(recordId, stateOptions[0].id);
+          // const res = await stateField.setValue(recordId, stateOptions[0].id);
+          // console.log("setRecord res:", res);
         case 65:
-          _res = _context.sent;
-          console.log("setRecord res:", _res);
+          _context.next = 50;
+          break;
         case 67:
-          _context.next = 49;
+          _context.next = 72;
           break;
         case 69:
-          _context.next = 74;
-          break;
-        case 71:
-          _context.prev = 71;
-          _context.t0 = _context["catch"](47);
+          _context.prev = 69;
+          _context.t0 = _context["catch"](48);
           _iterator.e(_context.t0);
-        case 74:
-          _context.prev = 74;
+        case 72:
+          _context.prev = 72;
           _iterator.f();
-          return _context.finish(74);
-        case 77:
+          return _context.finish(72);
+        case 75:
           if (!(copyRecords.length > 0)) {
-            _context.next = 87;
+            _context.next = 104;
             break;
           }
           console.log("copyRecords: ", copyRecords);
-          dstRecords = copyRecordsToOtherTable(inputFieldMetaList, outputFieldMetaList, copyRecords, [20, 21]);
+          dstRecords = copyRecordsToOtherTable(inputFieldMetaList, outputFieldMetaList, copyRecords);
           console.log("dstRecords: ", dstRecords);
-          _context.next = 83;
+          _context.next = 81;
           return outputTable.addRecords(dstRecords);
-        case 83:
+        case 81:
           res = _context.sent;
           console.log("addRecords res:", res);
-          _context.next = 88;
-          break;
-        case 87:
-          console.log("没有需要拷贝的记录");
-        case 88:
+          // 2、更新状态
+          _iterator2 = function01_createForOfIteratorHelper(copyRecordIds);
+          _context.prev = 84;
+          _iterator2.s();
+        case 86:
+          if ((_step2 = _iterator2.n()).done) {
+            _context.next = 94;
+            break;
+          }
+          recordId = _step2.value;
           _context.next = 90;
+          return stateField.setValue(recordId, stateOptions[0].id);
+        case 90:
+          _res = _context.sent;
+          console.log("setRecord res:", _res);
+        case 92:
+          _context.next = 86;
+          break;
+        case 94:
+          _context.next = 99;
+          break;
+        case 96:
+          _context.prev = 96;
+          _context.t1 = _context["catch"](84);
+          _iterator2.e(_context.t1);
+        case 99:
+          _context.prev = 99;
+          _iterator2.f();
+          return _context.finish(99);
+        case 102:
+          _context.next = 105;
+          break;
+        case 104:
+          console.log("没有需要拷贝的记录");
+        case 105:
+          _context.next = 107;
           return chunk_FXRHZUWR_p.ui.showToast({
             toastType: 'success',
             message: "\u5B8C\u6210".concat(copyRecords.length, "\u4E2A\u91C7\u8D2D\u5165\u5E93")
           });
-        case 90:
-          _context.next = 93;
+        case 107:
+          _context.next = 110;
           break;
-        case 92:
+        case 109:
           alert("\u8BF7\u9009\u4E2D\u8868\u683C\uFF1A".concat(inputTableName, " \u540E\uFF0C\u518D\u70B9\u51FB\u8FD0\u884C"));
-        case 93:
+        case 110:
           return _context.abrupt("return");
-        case 94:
+        case 111:
         case "end":
           return _context.stop();
       }
-    }, _callee, null, [[47, 71, 74, 77]]);
+    }, _callee, null, [[48, 69, 72, 75], [84, 96, 99, 102]]);
   }));
   return _caiGouToXianCun.apply(this, arguments);
 }
@@ -1252,7 +1281,7 @@ function xianCunToShengChan() {
 }
 function _xianCunToShengChan() {
   _xianCunToShengChan = function02_asyncToGenerator(/*#__PURE__*/function02_regeneratorRuntime().mark(function _callee() {
-    var inputTableName, outputTableName, selection, inputTable, inputName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, cutRecords, _iterator, _step, recordId, recordValue, res, dstRecords;
+    var inputTableName, outputTableName, selection, inputTable, inputName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, cutRecords, cutRecordIds, _iterator, _step, _recordId, recordValue, dstRecords, res, _iterator2, _step2, recordId, _res;
     return function02_regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
@@ -1284,7 +1313,7 @@ function _xianCunToShengChan() {
           // 获取选中的table名称
           console.log("inputName:", inputName);
           if (!(inputName === inputTableName)) {
-            _context.next = 74;
+            _context.next = 93;
             break;
           }
           _context.next = 20;
@@ -1316,73 +1345,104 @@ function _xianCunToShengChan() {
           console.log("inputFieldMetaList: ", inputFieldMetaList);
           console.log("outputFieldMetaList: ", outputFieldMetaList);
           cutRecords = [];
+          cutRecordIds = [];
           _iterator = function02_createForOfIteratorHelper(selectRecordIdList);
-          _context.prev = 39;
+          _context.prev = 40;
           _iterator.s();
-        case 41:
+        case 42:
           if ((_step = _iterator.n()).done) {
-            _context.next = 54;
+            _context.next = 52;
             break;
           }
-          recordId = _step.value;
-          _context.next = 45;
-          return inputTable.getRecordById(recordId);
-        case 45:
+          _recordId = _step.value;
+          _context.next = 46;
+          return inputTable.getRecordById(_recordId);
+        case 46:
           recordValue = _context.sent;
           console.log("recordValue: ", recordValue);
           cutRecords.push(recordValue);
-          _context.next = 50;
-          return inputTable.deleteRecord(recordId);
+          cutRecordIds.push(_recordId);
+          // const res = await inputTable.deleteRecord(recordId); // 删除记录
+          // console.log("deleteRecord, res: ", res);
         case 50:
-          res = _context.sent;
-          // 删除记录
-          console.log("deleteRecord, res: ", res);
+          _context.next = 42;
+          break;
         case 52:
-          _context.next = 41;
+          _context.next = 57;
           break;
         case 54:
-          _context.next = 59;
-          break;
-        case 56:
-          _context.prev = 56;
-          _context.t0 = _context["catch"](39);
+          _context.prev = 54;
+          _context.t0 = _context["catch"](40);
           _iterator.e(_context.t0);
-        case 59:
-          _context.prev = 59;
+        case 57:
+          _context.prev = 57;
           _iterator.f();
-          return _context.finish(59);
-        case 62:
+          return _context.finish(57);
+        case 60:
           if (!(cutRecords.length > 0)) {
-            _context.next = 69;
+            _context.next = 88;
             break;
           }
           console.log("cutRecords: ", cutRecords);
           dstRecords = copyRecordsToOtherTable(inputFieldMetaList, outputFieldMetaList, cutRecords);
-          _context.next = 67;
+          _context.next = 65;
           return outputTable.addRecords(dstRecords);
-        case 67:
+        case 65:
+          res = _context.sent;
+          console.log("addRecords, res: ", res);
+          // 删除记录
+          _iterator2 = function02_createForOfIteratorHelper(cutRecordIds);
+          _context.prev = 68;
+          _iterator2.s();
+        case 70:
+          if ((_step2 = _iterator2.n()).done) {
+            _context.next = 78;
+            break;
+          }
+          recordId = _step2.value;
+          _context.next = 74;
+          return inputTable.deleteRecord(recordId);
+        case 74:
+          _res = _context.sent;
+          // 删除记录
+          console.log("deleteRecord, res: ", _res);
+        case 76:
           _context.next = 70;
           break;
-        case 69:
+        case 78:
+          _context.next = 83;
+          break;
+        case 80:
+          _context.prev = 80;
+          _context.t1 = _context["catch"](68);
+          _iterator2.e(_context.t1);
+        case 83:
+          _context.prev = 83;
+          _iterator2.f();
+          return _context.finish(83);
+        case 86:
+          _context.next = 89;
+          break;
+        case 88:
           console.log("没有需要剪切的记录");
-        case 70:
-          _context.next = 72;
+        case 89:
+          _context.next = 91;
           return chunk_FXRHZUWR_p.ui.showToast({
             toastType: 'success',
             message: "\u5B8C\u6210".concat(copyRecords.length, "\u4E2A\u7269\u6599\u5165\u52A0\u5DE5\u5355")
           });
-        case 72:
-          _context.next = 75;
+        case 91:
+          _context.next = 94;
           break;
-        case 74:
+        case 93:
           alert("\u8BF7\u9009\u4E2D\u8868\u683C\uFF1A".concat(inputTableName, " \u540E\uFF0C\u518D\u70B9\u51FB\u8FD0\u884C"));
-        case 75:
+        case 94:
           return _context.abrupt("return");
-        case 76:
+        case 95:
         case "end":
           return _context.stop();
       }
-    }, _callee, null, [[39, 56, 59, 62]]);
+    }, _callee, null, [[40, 54, 57, 60], [68, 80, 83, 86]]);
   }));
   return _xianCunToShengChan.apply(this, arguments);
 }
@@ -1401,19 +1461,19 @@ function chengPinToXianCun() {
 }
 function _chengPinToXianCun() {
   _chengPinToXianCun = function03_asyncToGenerator(/*#__PURE__*/function03_regeneratorRuntime().mark(function _callee() {
-    var inputTableName, outputTableName, selection, inputTable, inputName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, stateFieldName, stateField, stateOptions, copyRecords, _iterator, _step, recordId, recordValue, stateValue, _res, dstRecords, res;
+    var inputTableName, outputTableName, selection, inputTable, inputName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, stateFieldName, stateField, stateOptions, copyRecords, copyRecordIds, _iterator, _step, _recordId, recordValue, stateValue, dstRecords, res, _iterator2, _step2, recordId, _res;
     return function03_regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
-          console.log('03 成品明细单->现存量');
+          console.log('03 生产加工单->现存量');
           console.log("bitable.ui.ToastType:", chunk_FXRHZUWR_p);
           _context.next = 4;
           return chunk_FXRHZUWR_p.ui.showToast({
             toastType: 'loading',
-            message: "\u6B63\u5728\u62F7\u8D1D\u201C\u6210\u54C1\u660E\u7EC6\u5355\u201D\u5230\u201C\u73B0\u5B58\u91CF\u201D"
+            message: "\u6B63\u5728\u62F7\u8D1D\u201C\u751F\u4EA7\u52A0\u5DE5\u5355\u201D\u5230\u201C\u73B0\u5B58\u91CF\u201D"
           });
         case 4:
-          inputTableName = "成品明细单";
+          inputTableName = "生产加工单";
           outputTableName = "现存量"; // 1、获取选中的记录
           _context.next = 8;
           return chunk_FXRHZUWR_p.base.getSelection();
@@ -1434,7 +1494,7 @@ function _chengPinToXianCun() {
           // 获取选中的table名称
           console.log("inputName:", inputName);
           if (!(inputName === inputTableName)) {
-            _context.next = 93;
+            _context.next = 105;
             break;
           }
           _context.next = 21;
@@ -1467,7 +1527,7 @@ function _chengPinToXianCun() {
           console.log("outputFieldMetaList: ", outputFieldMetaList);
 
           // 3、状态信息
-          stateFieldName = "状态";
+          stateFieldName = "加工状态";
           _context.next = 41;
           return inputTable.getField(stateFieldName);
         case 41:
@@ -1480,86 +1540,112 @@ function _chengPinToXianCun() {
 
           // 4、读取待copy的记录
           copyRecords = [];
+          copyRecordIds = [];
           _iterator = function03_createForOfIteratorHelper(selectRecordIdList);
-          _context.prev = 48;
+          _context.prev = 49;
           _iterator.s();
-        case 50:
+        case 51:
           if ((_step = _iterator.n()).done) {
-            _context.next = 70;
-            break;
-          }
-          recordId = _step.value;
-          _context.next = 54;
-          return inputTable.getRecordById(recordId);
-        case 54:
-          recordValue = _context.sent;
-          _context.next = 57;
-          return stateField.getValue(recordId);
-        case 57:
-          stateValue = _context.sent;
-          console.log("stateValue:", stateValue);
-          if (!(stateValue && stateValue.text === "已入库")) {
             _context.next = 63;
             break;
           }
-          return _context.abrupt("continue", 68);
+          _recordId = _step.value;
+          _context.next = 55;
+          return inputTable.getRecordById(_recordId);
+        case 55:
+          recordValue = _context.sent;
+          _context.next = 58;
+          return stateField.getValue(_recordId);
+        case 58:
+          stateValue = _context.sent;
+          console.log("stateValue:", stateValue);
+          if (stateValue && stateValue.text === "已完成") {
+            copyRecords.push(recordValue);
+            copyRecordIds.push(_recordId);
+            // 1、更新状态
+            // const res = await stateField.setValue(recordId, stateOptions[0].id);
+            // console.log("setRecord res:", res);
+          }
+        case 61:
+          _context.next = 51;
+          break;
         case 63:
-          copyRecords.push(recordValue);
-          // 1、更新状态
-          _context.next = 66;
-          return stateField.setValue(recordId, stateOptions[0].id);
-        case 66:
-          _res = _context.sent;
-          console.log("setRecord res:", _res);
-        case 68:
-          _context.next = 50;
+          _context.next = 68;
           break;
-        case 70:
-          _context.next = 75;
-          break;
-        case 72:
-          _context.prev = 72;
-          _context.t0 = _context["catch"](48);
+        case 65:
+          _context.prev = 65;
+          _context.t0 = _context["catch"](49);
           _iterator.e(_context.t0);
-        case 75:
-          _context.prev = 75;
+        case 68:
+          _context.prev = 68;
           _iterator.f();
-          return _context.finish(75);
-        case 78:
+          return _context.finish(68);
+        case 71:
           if (!(copyRecords.length > 0)) {
-            _context.next = 88;
+            _context.next = 100;
             break;
           }
           console.log("copyRecords: ", copyRecords);
           dstRecords = copyRecordsToOtherTable(inputFieldMetaList, outputFieldMetaList, copyRecords);
           console.log("dstRecords: ", dstRecords);
-          _context.next = 84;
+          _context.next = 77;
           return outputTable.addRecords(dstRecords);
-        case 84:
+        case 77:
           res = _context.sent;
           console.log("addRecords res:", res);
-          _context.next = 89;
-          break;
+          // 2、更新状态
+          _iterator2 = function03_createForOfIteratorHelper(copyRecordIds);
+          _context.prev = 80;
+          _iterator2.s();
+        case 82:
+          if ((_step2 = _iterator2.n()).done) {
+            _context.next = 90;
+            break;
+          }
+          recordId = _step2.value;
+          _context.next = 86;
+          return stateField.setValue(recordId, stateOptions[2].id);
+        case 86:
+          _res = _context.sent;
+          // 已完成且存入现存量
+          console.log("setRecord res:", _res);
         case 88:
+          _context.next = 82;
+          break;
+        case 90:
+          _context.next = 95;
+          break;
+        case 92:
+          _context.prev = 92;
+          _context.t1 = _context["catch"](80);
+          _iterator2.e(_context.t1);
+        case 95:
+          _context.prev = 95;
+          _iterator2.f();
+          return _context.finish(95);
+        case 98:
+          _context.next = 101;
+          break;
+        case 100:
           console.log("没有需要拷贝的记录");
-        case 89:
-          _context.next = 91;
+        case 101:
+          _context.next = 103;
           return chunk_FXRHZUWR_p.ui.showToast({
             toastType: 'success',
             message: "\u5B8C\u6210".concat(copyRecords.length, "\u4E2A\u6210\u54C1\u5165\u5E93")
           });
-        case 91:
-          _context.next = 94;
+        case 103:
+          _context.next = 106;
           break;
-        case 93:
+        case 105:
           alert("\u8BF7\u9009\u4E2D\u8868\u683C\uFF1A".concat(inputTableName, " \u540E\uFF0C\u518D\u70B9\u51FB\u8FD0\u884C"));
-        case 94:
+        case 106:
           return _context.abrupt("return");
-        case 95:
+        case 107:
         case "end":
           return _context.stop();
       }
-    }, _callee, null, [[48, 72, 75, 78]]);
+    }, _callee, null, [[49, 65, 68, 71], [80, 92, 95, 98]]);
   }));
   return _chengPinToXianCun.apply(this, arguments);
 }
