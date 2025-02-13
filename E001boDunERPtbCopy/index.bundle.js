@@ -1095,7 +1095,7 @@ function copyClient() {
 }
 function _copyClient() {
   _copyClient = function1_asyncToGenerator(/*#__PURE__*/function1_regeneratorRuntime().mark(function _callee() {
-    var inputTableName, outputTableName, selection, inputTable, inputName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, stateFieldName, stateField, copyRecords, copyRecordIds, _iterator, _step, _recordId, recordValue, stateValue, copyOut, dstRecords, copyStatus, res1, index, recordId, status, res;
+    var selection, inputTable, inputName, outputTableName, inputView, selectRecordIdList, outputTable, inputFieldMetaList, outputFieldMetaList, stateFieldName, stateField, copyRecords, copyRecordIds, _iterator, _step, _recordId, recordValue, stateValue, copyOut, dstRecords, copyStatus, res1, index, recordId, status, res;
     return function1_regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
@@ -1106,108 +1106,126 @@ function _copyClient() {
             message: "\u6B63\u5728\u62F7\u8D1D\u5BA2\u6237\u4FE1\u606F..."
           });
         case 3:
-          inputTableName = "✏客户管理";
-          outputTableName = "✏客户管理-汇总"; // 1、获取选中的记录
-          _context.next = 7;
+          _context.next = 5;
           return chunk_FXRHZUWR_p.base.getSelection();
-        case 7:
+        case 5:
           selection = _context.sent;
           // 获取选中信息
           console.log("selection:", selection);
-          _context.next = 11;
+          _context.next = 9;
           return chunk_FXRHZUWR_p.base.getTableById(selection.tableId);
-        case 11:
+        case 9:
           inputTable = _context.sent;
           // 获取选中的table
           console.log("inputTable:", inputTable);
-          _context.next = 15;
+          _context.next = 13;
           return inputTable.getName();
-        case 15:
+        case 13:
           inputName = _context.sent;
           // 获取选中的table名称
           console.log("inputName:", inputName);
-          if (!(inputName === inputTableName)) {
-            _context.next = 101;
-            break;
-          }
-          _context.next = 20;
+          outputTableName = "".concat(inputName, "-\u6C47\u603B"); // if(inputName === inputTableName){ // 判断选中的table是否为目标table
+          if (false) {}
+          _context.next = 19;
           return inputTable.getViewById(selection.viewId);
-        case 20:
+        case 19:
           inputView = _context.sent;
           // 获取视图
           console.log("inputView:", inputView);
-          _context.next = 24;
+          _context.next = 23;
           return inputView.getSelectedRecordIdList();
-        case 24:
+        case 23:
           selectRecordIdList = _context.sent;
           // 获取视图选中的记录
           console.log("selectRecordIdList: ", selectRecordIdList);
 
           // 2、获取表格信息
-          _context.next = 28;
+          outputTable = null;
+          _context.prev = 26;
+          _context.next = 29;
           return chunk_FXRHZUWR_p.base.getTableByName(outputTableName);
-        case 28:
+        case 29:
           outputTable = _context.sent;
-          _context.next = 31;
+          _context.next = 37;
+          break;
+        case 32:
+          _context.prev = 32;
+          _context.t0 = _context["catch"](26);
+          console.error("\u672A\u627E\u5230\u76EE\u6807\u8868\u683C: ".concat(outputTableName));
+          alert("\u672A\u627E\u5230\u76EE\u6807\u8868\u683C: ".concat(outputTableName));
+          return _context.abrupt("return");
+        case 37:
+          _context.next = 39;
           return inputTable.getFieldMetaList();
-        case 31:
+        case 39:
           inputFieldMetaList = _context.sent;
-          _context.next = 34;
+          _context.next = 42;
           return outputTable.getFieldMetaList();
-        case 34:
+        case 42:
           outputFieldMetaList = _context.sent;
           console.log("inputFieldMetaList: ", inputFieldMetaList);
           console.log("outputFieldMetaList: ", outputFieldMetaList);
           stateFieldName = "同步状态";
-          _context.next = 40;
+          stateField = null;
+          _context.prev = 47;
+          _context.next = 50;
           return inputTable.getField(stateFieldName);
-        case 40:
+        case 50:
           stateField = _context.sent;
+          _context.next = 58;
+          break;
+        case 53:
+          _context.prev = 53;
+          _context.t1 = _context["catch"](47);
+          console.error("获取“同步状态”字段失败", _context.t1);
+          alert("\u8BF7\u786E\u5B9A\u8868\u683C\u4E2D\u5305\u542B\u201C\u540C\u6B65\u72B6\u6001\u201D\u5B57\u6BB5\uFF0C\u4E14\u7C7B\u578B\u4E3A\u201C\u6587\u672C\u201D");
+          return _context.abrupt("return");
+        case 58:
           // 3、读取待拷贝records
           copyRecords = []; // 待拷贝数据
           copyRecordIds = []; // 待拷贝数据id
           _iterator = function1_createForOfIteratorHelper(selectRecordIdList);
-          _context.prev = 44;
+          _context.prev = 61;
           _iterator.s();
-        case 46:
+        case 63:
           if ((_step = _iterator.n()).done) {
-            _context.next = 60;
+            _context.next = 77;
             break;
           }
           _recordId = _step.value;
-          _context.next = 50;
+          _context.next = 67;
           return inputTable.getRecordById(_recordId);
-        case 50:
+        case 67:
           recordValue = _context.sent;
-          _context.next = 53;
+          _context.next = 70;
           return stateField.getValue(_recordId);
-        case 53:
+        case 70:
           stateValue = _context.sent;
           if (!(stateValue && stateValue.length > 0 && stateValue[0].text === "已同步")) {
-            _context.next = 56;
+            _context.next = 73;
             break;
           }
-          return _context.abrupt("continue", 58);
-        case 56:
+          return _context.abrupt("continue", 75);
+        case 73:
           copyRecords.push(recordValue);
           copyRecordIds.push(_recordId);
-        case 58:
-          _context.next = 46;
+        case 75:
+          _context.next = 63;
           break;
-        case 60:
-          _context.next = 65;
+        case 77:
+          _context.next = 82;
           break;
-        case 62:
-          _context.prev = 62;
-          _context.t0 = _context["catch"](44);
-          _iterator.e(_context.t0);
-        case 65:
-          _context.prev = 65;
+        case 79:
+          _context.prev = 79;
+          _context.t2 = _context["catch"](61);
+          _iterator.e(_context.t2);
+        case 82:
+          _context.prev = 82;
           _iterator.f();
-          return _context.finish(65);
-        case 68:
+          return _context.finish(82);
+        case 85:
           if (!(copyRecords.length > 0)) {
-            _context.next = 98;
+            _context.next = 115;
             break;
           }
           console.log("copyRecords: ", copyRecords);
@@ -1216,58 +1234,53 @@ function _copyClient() {
           dstRecords = copyOut.outRecords;
           copyStatus = copyOut.copyState;
           console.log("dstRecords: ", dstRecords);
-          _context.prev = 74;
-          _context.next = 77;
+          _context.prev = 91;
+          _context.next = 94;
           return outputTable.addRecords(dstRecords);
-        case 77:
+        case 94:
           res1 = _context.sent;
           console.log("addRecords res:", res1);
 
           // 修改状态
           index = 0;
-        case 80:
+        case 97:
           if (!(index < copyRecordIds.length)) {
-            _context.next = 89;
+            _context.next = 106;
             break;
           }
           recordId = copyRecordIds[index];
           status = copyStatus[index];
-          _context.next = 85;
+          _context.next = 102;
           return stateField.setValue(recordId, status);
-        case 85:
+        case 102:
           res = _context.sent;
-        case 86:
+        case 103:
           index++;
-          _context.next = 80;
+          _context.next = 97;
           break;
-        case 89:
-          _context.next = 91;
+        case 106:
+          _context.next = 108;
           return chunk_FXRHZUWR_p.ui.showToast({
             toastType: 'success',
             message: "\u62F7\u8D1D\u5B8C\u6210\uFF0C\u6210\u529F".concat(dstRecords.length, "\u6761\uFF0C \u5931\u8D25").concat(copyRecordIds.length - dstRecords.length, "\u6761\uFF0C \u9009\u4E2D\u5DF2\u540C\u6B65").concat(selectRecordIdList.length - copyRecordIds.length, "\u6761")
           });
-        case 91:
-          _context.next = 96;
+        case 108:
+          _context.next = 113;
           break;
-        case 93:
-          _context.prev = 93;
-          _context.t1 = _context["catch"](74);
-          console.error("addRecords error:", _context.t1);
-        case 96:
-          _context.next = 99;
+        case 110:
+          _context.prev = 110;
+          _context.t3 = _context["catch"](91);
+          console.error("addRecords error:", _context.t3);
+        case 113:
+          _context.next = 116;
           break;
-        case 98:
+        case 115:
           alert("\u8FD0\u884C\u7ED3\u675F\uFF0C\u62F7\u8D1D0\u6761\uFF1A\u9009\u4E2D\u8BB0\u5F55\u5DF2\u540C\u6B65");
-        case 99:
-          _context.next = 102;
-          break;
-        case 101:
-          alert("\u8BF7\u9009\u62E9\u8868\u683C\uFF1A".concat(inputTableName, " \u540E\uFF0C\u518D\u70B9\u51FB\u62F7\u8D1D"));
-        case 102:
+        case 116:
         case "end":
           return _context.stop();
       }
-    }, _callee, null, [[44, 62, 65, 68], [74, 93]]);
+    }, _callee, null, [[26, 32], [47, 53], [61, 79, 82, 85], [91, 110]]);
   }));
   return _copyClient.apply(this, arguments);
 }
